@@ -13,7 +13,7 @@ app.use(cors()); // Permite conexiones externas
 app.use(express.json()); // Permite leer JSON en el body
 
 // 3. Rutas
-app.use('/api/promotions', require('./routes/promoRoutes'));
+app.use('/promotions', require('./routes/promoRoutes'));
 
 // 4. Ruta base para probar que el servidor está vivo
 app.get('/', (req, res) => {
