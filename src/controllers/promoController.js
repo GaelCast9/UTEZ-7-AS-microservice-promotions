@@ -3,21 +3,23 @@ const Promotion = require('../models/Promotion');
 // 1. CREAR (POST)
 exports.createPromotion = async (req, res) => {
     try {
-        // Agregamos 'type' y 'valor' al destructuring
         const { nombre, type, valor, descripcion, fechaInicio, fechaFin, eventoAsociadoId } = req.body;
 
         if (new Date(fechaInicio) >= new Date(fechaFin)) {
             return res.status(400).json({ msg: 'La fecha de inicio debe ser anterior a la fecha de fin' });
         }
 
+        // Validación extra: Asegurarnos de que sea un array o convertirlo
+        let eventosIds = Array.isArray(eventoAsociadoId) ? eventoAsociadoId : [eventoAsociadoId];
+
         const nuevaPromocion = new Promotion({
             nombre,
-            type,       // Guardamos el tipo (ej: '2x1')
-            valor,      // Guardamos el valor numérico (ej: 50)
+            type,
+            valor,
             descripcion,
             fechaInicio,
             fechaFin,
-            eventoAsociadoId
+            eventoAsociadoId: eventosIds // Guardamos el array
         });
 
         await nuevaPromocion.save();
@@ -27,7 +29,7 @@ exports.createPromotion = async (req, res) => {
     }
 };
 
-// 2. OBTENER TODAS (GET)
+// 2. OBTENER TODAS (GET) -> Sin cambios, funciona igual.
 exports.getPromotions = async (req, res) => {
     try {
         const promociones = await Promotion.find();
@@ -37,11 +39,11 @@ exports.getPromotions = async (req, res) => {
     }
 };
 
-// 3. OBTENER POR ID DE EVENTO (GET) -> ¡Nuevo!
+// 3. OBTENER POR ID DE EVENTO (GET)
 exports.getPromotionsByEvent = async (req, res) => {
     try {
         const { eventId } = req.params;
-        // Busca todas las promos que tengan ese eventoAsociadoId
+        // Mongoose buscará si 'eventId' existe DENTRO del array 'eventoAsociadoId' automaticament
         const promociones = await Promotion.find({ eventoAsociadoId: eventId });
         
         if (!promociones || promociones.length === 0) {
@@ -54,11 +56,10 @@ exports.getPromotionsByEvent = async (req, res) => {
     }
 };
 
-// 4. ACTUALIZAR (PUT) -> ¡Nuevo!
+// 4. ACTUALIZAR (PUT)
 exports.updatePromotion = async (req, res) => {
     try {
         const { id } = req.params;
-        // { new: true } hace que te devuelva el objeto ya modificado, no el viejo
         const promocionActualizada = await Promotion.findByIdAndUpdate(id, req.body, { new: true });
 
         if (!promocionActualizada) {
@@ -71,7 +72,7 @@ exports.updatePromotion = async (req, res) => {
     }
 };
 
-// 5. ELIMINAR (DELETE) -> ¡Nuevo!
+// 5. ELIMINAR (DELETE) -> Sin cambios
 exports.deletePromotion = async (req, res) => {
     try {
         const { id } = req.params;

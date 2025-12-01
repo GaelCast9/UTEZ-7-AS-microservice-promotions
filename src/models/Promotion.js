@@ -5,14 +5,12 @@ const promotionSchema = new mongoose.Schema({
         type: String,
         required: [true, 'El nombre de la promoción es obligatorio']
     },
-    // NUEVO CAMPO SOLICITADO
     type: {
         type: String,
         required: [true, 'El tipo de promoción es obligatorio'], 
-        enum: ['2x1', 'PERCENTAGE', 'FLAT_DISCOUNT', 'FREE_SHIPPING'], // Opcional: restringe los valores permitidos
+        enum: ['2x1', 'PERCENTAGE', 'FLAT_DISCOUNT', 'FREE_SHIPPING'],
         default: 'PERCENTAGE'
     },
-    // Sugerencia: Un campo "valor" ayuda a los cálculos (ej. si type es PERCENTAGE, valor es 50)
     valor: {
         type: Number,
         default: 0
@@ -29,10 +27,12 @@ const promotionSchema = new mongoose.Schema({
         type: Date,
         required: [true, 'La fecha de fin es obligatoria']
     },
+    // --- CAMBIO IMPORTANTE: Ahora es un Array de Strings ---
     eventoAsociadoId: {
-        type: String, 
-        required: [true, 'La promoción debe estar ligada a un evento']
+        type: [String], 
+        required: [true, 'La promoción debe estar ligada a al menos un evento']
     },
+    // -------------------------------------------------------
     activo: {
         type: Boolean,
         default: true
